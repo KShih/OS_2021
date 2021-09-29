@@ -42,7 +42,6 @@ void uniq(int fd, char *name) {
         printf(1, "wc: read error\n");
         exit();
     }
-//   printf(1, "%d %d %d %s\n", l, w, c, name);
 }
 
 int main(int argc, char *argv[]) {
