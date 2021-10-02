@@ -210,6 +210,121 @@ void uniqCnt(int fd, char *name) {
     }
 }
 
+int compareNoSens(char* str1, char* str2){
+    int index = 0;
+    int len1 = strlen(str1);
+    int len2 = strlen(str2);
+    if(len1 != len2){
+        return -1;
+    }
+    while(index < len1) {
+        if(str1[index] == str2[index]) {
+            index ++;
+        }else if(str1[index] > str2[index]){
+            if(str1[index] >= 'a' && str1[index] <= 'z' && str2[index] >= 'A' && str2[index] <= 'Z'
+            && str1[index] - str2[index] == 32){
+                index ++;
+            }else{
+                return -1;
+            }
+        }else if(str1[index] < str2[index]){
+            if(str1[index] >= 'A' && str1[index] <= 'Z' && str2[index] >= 'a' && str2[index] <= 'z'
+            && str2[index] - str1[index] == 32){
+                index ++;
+            }else{
+                return -1;
+            }
+        }
+    }
+    return 1;
+
+}
+
+void uniqCombine(int fd, char *name) {
+    int i, n;
+    char *prev;
+    char *cur;
+    int line = 0;
+    int start = 0;
+    int prevCnt = 0;
+    int w = 0;
+    while ((n = read(fd, buf, sizeof(buf))) > 0) {
+        for (i = 0; i < n; i++) {
+            w += 1;
+            if (buf[i] == '\n') {
+                line += 1;
+                cur = (char *) malloc(w);
+                int index = 0;
+                int end = start + w;
+                while (start < end) {
+                    cur[index] = buf[start];
+                    index ++;
+                    start ++;
+                }
+                w = 0;
+                if(line != 1 && compareNoSens(prev, cur) != 1){
+                    printf(2, "%d %s", prevCnt, prev);
+                    prevCnt = 1;
+                } else {
+                    prevCnt ++;
+                }
+                prev = (char *) malloc(sizeof(cur));
+                strcpy(prev, cur);
+                free(cur);
+            }
+            
+        }
+        start = 0;
+    }
+    printf(2, "%d %s", prevCnt, prev);
+    free(prev);
+    
+    if (n < 0) {
+        printf(1, "uniq: read error\n");
+        exit();
+    }
+}
+
+void uniqNoSens(int fd, char* name){
+    int i, n;
+    char *prev;
+    char *cur;
+    int line = 0;
+    int start = 0;
+    int w = 0;
+    while ((n = read(fd, buf, sizeof(buf))) > 0) {
+        for (i = 0; i < n; i++) {
+            w += 1;
+            if (buf[i] == '\n') {
+                line += 1;
+                cur = (char *) malloc(w);
+                int index = 0;
+                int end = start + w;
+                while (start < end) {
+                    cur[index] = buf[start];
+                    index ++;
+                    start ++;
+                }
+                w = 0;
+                if(line == 1 || compareNoSens(prev, cur) != 1){
+                    printf(1, "%s", cur);
+                }
+                prev = (char *) malloc(sizeof(cur));
+                strcpy(prev, cur);
+                free(cur);
+            }
+            
+        }
+        start = 0;
+    }
+    free(prev);
+    
+    if (n < 0) {
+        printf(1, "uniq: read error\n");
+        exit();
+    }
+}
+
 int main(int argc, char *argv[]) {
     int fd, i;
     char c;
@@ -224,12 +339,30 @@ int main(int argc, char *argv[]) {
     }
 
     if ((++argv)[0] && argv[0][0] == '-') {
+        if(argc == 4) {
+            argv += 2;
+            if ((fd = open(*argv, 0)) < 0) {
+                printf(1, "uniq: cannot open %s\n", argv[3]);
+                exit();
+            }
+            uniqCombine(fd, *argv);
+            close(fd);
+            exit();
+        }
         while(argv[0][0] == '-')
         {
             while((c = *++argv[0]))
             {
                 switch(c) {
                     case 'i':
+                        for (i = 1; i < argc-1; i++) {
+                            if ((fd = open(argv[i], 0)) < 0) {
+                                printf(1, "uniq: cannot open %s\n", argv[i]);
+                                exit();
+                            }
+                            uniqNoSens(fd, argv[i]);
+                            close(fd);
+                        }
                         break;
                     case 'c':
                         for (i = 1; i < argc-1; i++) {
@@ -240,7 +373,6 @@ int main(int argc, char *argv[]) {
                             uniqCnt(fd, argv[i]);
                             close(fd);
                         }
-                        display();
                         break;
                     case 'd':
                         for (i = 1; i < argc-1; i++) {
