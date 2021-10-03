@@ -268,8 +268,10 @@ void uniqCombine(int fd, char *name) {
                 } else {
                     prevCnt ++;
                 }
-                prev = (char *) malloc(sizeof(cur));
-                strcpy(prev, cur);
+                if (compareNoSens(prev, cur) != 1) {
+                    prev = (char *) malloc(sizeof(cur));
+                    strcpy(prev, cur);
+                }
                 free(cur);
             }
             
