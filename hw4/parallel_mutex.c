@@ -31,6 +31,9 @@ double now() {
     return tv.tv_sec + tv.tv_usec / 1000000.0;
 }
 
+// Part 1: add lock to keep comepetion of resource
+// Part 4
+
 // Inserts a key-value pair into the table
 void insert(int key, int val) {
     int i = key % NUM_BUCKETS;
@@ -43,6 +46,8 @@ void insert(int key, int val) {
     table[i] = e;
     pthread_mutex_unlock(&lock[i]);
 }
+
+// Part 3: It does not require a lock
 
 // Retrieves an entry from the hash table by key
 // Returns NULL if the key isn't found in the table
@@ -84,6 +89,10 @@ int main(int argc, char **argv) {
     long i;
     pthread_t *threads;
     double start, end;
+
+    for(i=0;i<NUM_BUCKETS;i++){
+        pthread_mutex_init(&lock[i], NULL);
+    }
 
     if (argc != 2) {
         panic("usage: ./parallel_hashtable <num_threads>");
