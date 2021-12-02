@@ -10,7 +10,9 @@
 int num_threads = 1;      // Number of threads (configurable)
 int keys[NUM_KEYS];
 
-pthread_mutex_t lock[NUM_BUCKETS];
+// Part 1: add lock to keep comepetion of resource
+// pthread_mutex_t lock;     // Part 1 - use a lock
+pthread_mutex_t mutex[NUM_BUCKETS];  // Part 4 - use mutex
 
 typedef struct _bucket_entry {
     int key;
@@ -31,23 +33,23 @@ double now() {
     return tv.tv_sec + tv.tv_usec / 1000000.0;
 }
 
-// Part 1: add lock to keep comepetion of resource
-// Part 4
-
 // Inserts a key-value pair into the table
 void insert(int key, int val) {
     int i = key % NUM_BUCKETS;
     bucket_entry *e = (bucket_entry *) malloc(sizeof(bucket_entry));
     if (!e) panic("No memory to allocate bucket!");
-    pthread_mutex_lock(&lock[i]);
+    // pthread_mutex_lock(&lock);    // Part 1 - acquire lock
+    pthread_mutex_lock(&mutex[i]);    // Part 4 - acquire mutex for each bucket
     e->next = table[i];
     e->key = key;
     e->val = val;
     table[i] = e;
-    pthread_mutex_unlock(&lock[i]);
+    // pthread_mutex_unlock(&lock);   // Part 1 - release lock
+    pthread_mutex_unlock(&mutex[i]);   // Part 4 - release mutex for each bucket
 }
 
-// Part 3: It does not require a lock
+// Part 3: It does not require a lock，
+// Because retrieve operation is already run in parallel
 
 // Retrieves an entry from the hash table by key
 // Returns NULL if the key isn't found in the table
@@ -90,8 +92,9 @@ int main(int argc, char **argv) {
     pthread_t *threads;
     double start, end;
 
-    for(i=0;i<NUM_BUCKETS;i++){
-        pthread_mutex_init(&lock[i], NULL);
+    // pthread_mutex_init(&lock, NULL);    // Part 1 - initialize the lock
+    for (int i = 0; i < NUM_BUCKETS; ++i) {
+        pthread_mutex_init(&mutex[i], NULL);   // Part 4 - initialize the mutex for each bucket
     }
 
     if (argc != 2) {
