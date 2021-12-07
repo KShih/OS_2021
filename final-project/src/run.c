@@ -8,6 +8,49 @@
 
 #include <string.h>
 
+unsigned int xorbuf(unsigned int *buffer, int size) {
+    unsigned int result = 0;
+    for (int i = 0; i < size; i++) {
+        result ^= buffer[i];
+    }
+    return result;
+}
+
+int readFromFile(char* filePath, int blockSize, int blockCount) {
+
+    if (blockSize % 4 != 0) {
+        printf("%s\n", "BlockSize should be times of 4.");
+        return -1;
+    }
+    
+    unsigned int result = 0;
+
+    int fd = open(filePath, O_RDONLY);
+    int buffer[blockSize];
+
+    // int size = read(fd, buffer, sizeof(buffer));
+    // while (size > 0){   
+    //     for (int i = 0; i < size / 4; i++) {
+    //         result ^= buffer[i];
+    //     }
+    //     size = read(fd, buffer, sizeof(buffer));
+    // }
+    // printf("%08x\n", result);
+
+    int size = read(fd, buffer, sizeof(buffer));
+    blockCount -= 1;
+    while (size > 0 && blockCount > 0){   
+        for (int i = 0; i < size / 4; i++) {
+            result ^= buffer[i];
+        }
+        size = read(fd, buffer, sizeof(buffer));
+        blockCount -= 1;
+    }
+    printf("%08x\n", result);
+    close(fd);
+    return 0;
+}
+
 int writeToFile(char * outPath, int blockSize, int blockCount) {
     int out = open(outPath, O_CREAT | O_WRONLY | O_APPEND, 0777);
     int i = 0;
@@ -45,9 +88,9 @@ int main(int argc, char *argv[]) {
         return -1;
     }
 
-    if (strcmp(mode, "-r") == 1) {
-
-    } else if (strcmp(mode, "-w") == 1) {
+    if (strcmp(mode, "-r") == 0) {
+        readFromFile(path, blockSize, blockCount);
+    } else if (strcmp(mode, "-w") == 0) {
         writeToFile(path, blockSize, blockCount);
     } else {
         printf("%s", "only accept [-r | -w]");
