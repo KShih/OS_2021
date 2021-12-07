@@ -26,7 +26,7 @@ int readFromFile(char* filePath, int blockSize, int blockCount) {
     unsigned int result = 0;
 
     int fd = open(filePath, O_RDONLY);
-    int buffer[blockSize];
+    int buffer[blockSize/4];
 
     // int size = read(fd, buffer, sizeof(buffer));
     // while (size > 0){   
