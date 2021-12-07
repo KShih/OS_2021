@@ -1,3 +1,6 @@
 #! /bin/sh
 rm -rf run
 rm -rf fast
+rm -rf out.txt
+rm -rf ./src/out.txt
+rm -rf ./src/run
