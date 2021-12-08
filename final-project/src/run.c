@@ -8,6 +8,8 @@
 
 #include <string.h>
 
+#include <time.h>
+
 unsigned int xorbuf(unsigned int *buffer, int size) {
     unsigned int result = 0;
     for (int i = 0; i < size; i++) {
@@ -40,13 +42,13 @@ int readFromFile(char* filePath, int blockSize, int blockCount) {
     int size = read(fd, buffer, sizeof(buffer));
     blockCount -= 1;
     while (size > 0 && blockCount > 0){   
-        for (int i = 0; i < size / 4; i++) {
-            result ^= buffer[i];
-        }
+        // for (int i = 0; i < size / 4; i++) {
+        //     result ^= buffer[i];
+        // }
         size = read(fd, buffer, sizeof(buffer));
         blockCount -= 1;
     }
-    printf("%08x\n", result);
+    // printf("%08x\n", result);
     close(fd);
     return 0;
 }
@@ -87,7 +89,8 @@ int main(int argc, char *argv[]) {
         printf("%s", "bockSize and blockCount should be int");
         return -1;
     }
-
+    time_t startTime, endTime;
+    startTime = time(NULL);
     if (strcmp(mode, "-r") == 0) {
         readFromFile(path, blockSize, blockCount);
     } else if (strcmp(mode, "-w") == 0) {
@@ -96,6 +99,10 @@ int main(int argc, char *argv[]) {
         printf("%s", "only accept [-r | -w]");
         return -1;
     }
+    endTime = time(NULL);
+    float fileSize = blockSize*blockCount/1024/1024;
+    float timeSpend = endTime-startTime;
+    printf("speed: %f MB/s", fileSize / timeSpend);
 
     return 0;
 }
