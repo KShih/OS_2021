@@ -76,7 +76,7 @@ int main(int argc, char *argv[]) {
         return -1;
     }
 
-    int blockSize, blockCount;
+    long long blockSize, blockCount;
     char* path = argv[1];
     char* mode = argv[2];
     // char* blockSize = argv[3];
@@ -85,7 +85,7 @@ int main(int argc, char *argv[]) {
     // printf("%s\n", mode);
     // printf("%s\n", blockSize);
     // printf("%s\n", blockCount);
-    if (sscanf(argv[3], "%d", &blockSize) != 1 || sscanf(argv[4], "%d", &blockCount) != 1){
+    if (sscanf(argv[3], "%lld", &blockSize) != 1 || sscanf(argv[4], "%lld", &blockCount) != 1){
         printf("%s", "bockSize and blockCount should be int");
         return -1;
     }
@@ -100,9 +100,11 @@ int main(int argc, char *argv[]) {
         return -1;
     }
     endTime = time(NULL);
-    float fileSize = blockSize*blockCount/1024/1024;
-    float timeSpend = endTime-startTime;
-    printf("speed: %f MB/s", fileSize / timeSpend);
+    double fileSize = blockCount/1024*blockSize/1024;
+    double timeSpend = endTime-startTime;
+    printf("fileSize: %f\n", fileSize);
+    printf("timeSpend: %f\n", timeSpend);
+    printf("speed: %f MB/s\n", fileSize / timeSpend);
 
     return 0;
 }
