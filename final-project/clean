@@ -1,7 +1,5 @@
 #! /bin/sh
 rm -rf run
+rm -rf run2
 rm -rf fast
-rm -rf out.txt
-rm -rf ./src/out.txt
-rm -rf ./src/run
 rm -rf ./src/test_lseek

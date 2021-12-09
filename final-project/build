@@ -1,3 +1,4 @@
 #! /bin/sh
 gcc src/run.c -o run
-# gcc src/fast.c -o fast
+gcc src/fast.c -o fast
+gcc src/run2.c -o run2
