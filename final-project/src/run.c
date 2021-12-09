@@ -19,17 +19,25 @@ unsigned int xorbuf(unsigned int *buffer, int size) {
 }
 
 int readFromFile(char* filePath, int blockSize, int blockCount) {
+    if (blockSize % 4 != 0) {
+        printf("%s\n", "BlockSize should be times of 4.");
+        return -1;
+    }
     unsigned int result = 0;
 
     int fd = open(filePath, O_RDONLY);
-    unsigned char buffer[blockSize];
+    int buffer[blockSize/4];
 
     int size = read(fd, buffer, sizeof(buffer));
     blockCount -= 1;
-    while (size > 0 && blockCount > 0){   
+    while (size > 0 && blockCount > 0){
+        for (int i = 0; i < size / 4; i++) {
+            result ^= buffer[i];
+        }
         size = read(fd, buffer, sizeof(buffer));
         blockCount -= 1;
     }
+    printf("XOR result: %08x\n", result);
     close(fd);
     return 0;
 }
