@@ -10,7 +10,7 @@ int getBlockCountInTenSeconds(char* filePath, int blockSize) {
     int size;
     int blockCount = 0;
     start = time(NULL);
-    while ((size = read(fd, buffer, sizeof(buffer))) > 0 && time(NULL) - start < 5){   
+    while ((size = read(fd, buffer, sizeof(buffer))) > 0 && time(NULL) - start < 10){   
         blockCount += 1;
     }
     close(fd);
