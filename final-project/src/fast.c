@@ -26,9 +26,6 @@ int readFile(char* filePath) {
         size = read(fd, buffer, sizeof(buffer));
     }
     printf("%08x\n", result);
-
-    
-    printf("%08x\n", result);
     close(fd);
     return 0;
 }
