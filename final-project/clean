@@ -2,4 +2,5 @@
 rm -rf run
 rm -rf run2
 rm -rf fast
+rm -rf fast2
 rm -rf ./src/test_lseek
